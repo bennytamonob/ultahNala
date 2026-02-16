@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Renjana Naladiptha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fffdf0;
+            --primary: #f59e0b; /* yellow-500 */
+            --secondary: #f97316; /* orange-500 */
+        }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg-color);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23fde047' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2v-4h4v-2H6zM36 4V0h-2v4h-4v2h4v4h2v-4h4v-2h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .font-header { font-family: 'Fredoka One', cursive; }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .sunflower-spin {
+            animation: spin 10s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.active { display: flex; }
+
+        #menu-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        #menu-section.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #fbd38d;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-orange-900 overflow-x-hidden">
+
+    <!-- Hero Section -->
+    <header class="min-h-screen flex flex-col items-center justify-center text-center p-6 relative">
+        <div class="absolute top-10 left-10 w-16 h-16 text-yellow-400 floating opacity-60 md:opacity-100">
+            <svg class="sunflower-spin" viewBox="0 0 24 24" fill="currentColor"><path d="M12,22C12,22 15,18 15,15C15,13.34 13.66,12 12,12C10.34,12 9,13.34 9,15C9,18 12,22 12,22M12,2C12,2 9,6 9,9C9,10.66 10.34,12 12,12C13.66,12 15,10.66 15,9C15,6 12,2 12,2M2,12C2,12 6,15 9,15C10.66,15 12,13.66 12,12C12,10.34 10.66,9 9,9C6,9 2,12 2,12M22,12C22,12 18,9 15,9C13.34,9 12,10.34 12,12C12,13.66 13.34,15 15,15C18,15 22,12 22,12Z"/></svg>
+        </div>
+        
+        <div class="bg-white/90 backdrop-blur-sm p-6 md:p-12 rounded-[2.5rem] border-8 border-yellow-400 shadow-2xl max-w-lg w-full z-10">
+            <div class="mb-4 inline-block bg-orange-100 text-orange-600 px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                Birthday Invitation
+            </div>
+            
+            <h1 id="display-name" class="font-header text-3xl md:text-5xl text-orange-600 leading-tight mb-6">
+                Renjana Naladiptha Sarci Tamonob
+            </h1>
+            
+            <div class="flex flex-col items-center justify-center gap-1 my-6">
+                <div class="flex items-center justify-center gap-4">
+                    <div class="h-[2px] w-8 md:w-12 bg-yellow-400"></div>
+                    <span id="display-date" class="font-bold text-xl md:text-2xl whitespace-nowrap">25 Februari 2026</span>
+                    <div class="h-[2px] w-8 md:w-12 bg-yellow-400"></div>
+                </div>
+                <div id="display-time-container" class="bg-orange-500 text-white px-4 py-1 rounded-full font-bold text-lg mt-2 shadow-md">
+                    🕒 <span id="display-time">17.00 Wita</span>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-8 text-gray-700">
+                <p class="text-lg flex items-center justify-center gap-2">
+                    📍 <span id="display-location" class="font-semibold">Bak Mie Akiu Mahendradata</span>
+                </p>
+                <div id="map-container" class="w-full h-32 md:h-40 bg-gray-100 rounded-2xl overflow-hidden mt-4 border-2 border-yellow-100">
+                    <iframe id="display-map" src="" class="w-full h-full border-0" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+
+            <button onclick="handleConfirmAttendance()" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg transition-all transform hover:scale-105 active:scale-95">
+                Konfirmasi Kehadiran 🌻
+            </button>
+        </div>
+
+        <div class="absolute bottom-10 right-10 w-20 h-20 text-orange-400 floating opacity-60 md:opacity-100" style="animation-delay: 1.5s;">
+            <svg class="sunflower-spin" viewBox="0 0 24 24" fill="currentColor"><path d="M12,22C12,22 15,18 15,15C15,13.34 13.66,12 12,12C10.34,12 9,13.34 9,15C9,18 12,22 12,22M12,2C12,2 9,6 9,9C9,10.66 10.34,12 12,12C13.66,12 15,10.66 15,9C15,6 12,2 12,2M2,12C2,12 6,15 9,15C10.66,15 12,13.66 12,12C12,10.34 10.66,9 9,9C6,9 2,12 2,12M22,12C22,12 18,9 15,9C13.34,9 12,10.34 12,12C12,13.66 13.34,15 15,15C18,15 22,12 22,12Z"/></svg>
+        </div>
+    </header>
+
+    <!-- Menu Section -->
+    <section id="menu-section" class="py-20 px-6 bg-yellow-50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="font-header text-3xl text-orange-600 mb-4">Pilih Menu Favoritmu</h2>
+            <p class="mb-10 text-gray-600">Klik "Pilih Menu" pada hidangan yang kamu inginkan!</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-3xl shadow-xl border-t-8 border-yellow-400 transform transition hover:-translate-y-2">
+                    <div class="aspect-square bg-orange-50 rounded-2xl mb-4 flex items-center justify-center text-6xl">🍜</div>
+                    <h3 class="font-bold text-xl mb-1">Bak Mie Spesial</h3>
+                    <p class="text-xs text-gray-400 mb-4 uppercase tracking-tighter font-semibold">Best Seller</p>
+                    <button onclick="openRSVP('Bak Mie Spesial')" class="w-full bg-orange-100 hover:bg-orange-500 hover:text-white text-orange-600 font-bold py-3 rounded-xl transition-colors">
+                        Pilih Menu
+                    </button>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl shadow-xl border-t-8 border-yellow-400 transform transition hover:-translate-y-2">
+                    <div class="aspect-square bg-orange-50 rounded-2xl mb-4 flex items-center justify-center text-6xl">🍲</div>
+                    <h3 class="font-bold text-xl mb-1">Mie Ayam Jamur</h3>
+                    <p class="text-xs text-gray-400 mb-4 uppercase tracking-tighter font-semibold">Taman Jamur</p>
+                    <button onclick="openRSVP('Mie Ayam Jamur')" class="w-full bg-orange-100 hover:bg-orange-500 hover:text-white text-orange-600 font-bold py-3 rounded-xl transition-colors">
+                        Pilih Menu
+                    </button>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl shadow-xl border-t-8 border-yellow-400 transform transition hover:-translate-y-2">
+                    <div class="aspect-square bg-orange-50 rounded-2xl mb-4 flex items-center justify-center text-6xl">🥟</div>
+                    <h3 class="font-bold text-xl mb-1">Pangsit Goreng</h3>
+                    <p class="text-xs text-gray-400 mb-4 uppercase tracking-tighter font-semibold">Extra Crispy</p>
+                    <button onclick="openRSVP('Pangsit Goreng')" class="w-full bg-orange-100 hover:bg-orange-500 hover:text-white text-orange-600 font-bold py-3 rounded-xl transition-colors">
+                        Pilih Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Settings FAB -->
+    <button onclick="toggleLogin()" class="fixed bottom-6 right-6 bg-white/50 backdrop-blur-md p-3 rounded-full shadow-lg border border-white hover:bg-white transition-all z-40 opacity-40 hover:opacity-100">
+        ⚙️
+    </button>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-sm border-4 border-orange-400">
+            <h3 class="font-header text-2xl text-center text-orange-600 mb-6">Login Admin</h3>
+            <div class="space-y-4">
+                <input type="text" id="login-user" placeholder="Username" class="w-full border-2 border-gray-100 rounded-xl p-3 focus:border-orange-400 outline-none">
+                <input type="password" id="login-pass" placeholder="Password" class="w-full border-2 border-gray-100 rounded-xl p-3 focus:border-orange-400 outline-none">
+                <button onclick="handleLogin()" class="w-full bg-orange-500 text-white font-bold py-3 rounded-xl">Masuk</button>
+                <button onclick="toggleLogin()" class="w-full text-gray-400 text-sm">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md border-4 border-yellow-400 max-h-[90vh] overflow-y-auto">
+            <h3 class="font-header text-2xl text-orange-600 mb-6">⚙️ Pengaturan Undangan</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nama Yang Berulang Tahun</label>
+                    <input type="text" id="set-name" class="w-full border-2 border-gray-100 rounded-xl p-3">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Tanggal Acara</label>
+                    <input type="text" id="set-date" class="w-full border-2 border-gray-100 rounded-xl p-3">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Jam Acara</label>
+                    <input type="text" id="set-time" class="w-full border-2 border-gray-100 rounded-xl p-3" placeholder="Contoh: 17.00 Wita">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nama Lokasi</label>
+                    <input type="text" id="set-location" class="w-full border-2 border-gray-100 rounded-xl p-3">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">URL Google Maps (Embed)</label>
+                    <textarea id="set-map" rows="3" class="w-full border-2 border-gray-100 rounded-xl p-3 text-sm"></textarea>
+                </div>
+                <div class="pt-4 flex gap-2">
+                    <button id="save-settings-btn" onclick="saveSettings()" class="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg disabled:opacity-50">Simpan</button>
+                    <button onclick="closeSettings()" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl">Tutup</button>
+                </div>
+                <button onclick="logoutAdmin()" class="w-full text-red-400 text-xs font-bold mt-4">LOGOUT ADMIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RSVP Modal -->
+    <div id="rsvpModal" class="modal">
+        <div class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden relative border-4 border-yellow-400">
+            <div class="bg-yellow-400 p-6 text-center">
+                <h3 class="font-header text-2xl text-orange-600">Form Kehadiran</h3>
+                <p class="text-sm text-orange-800">Menu Utama: <span id="selectedMenuDisplay" class="font-bold"></span></p>
+                <button onclick="closeRSVP()" class="absolute top-4 right-4 bg-white/50 w-8 h-8 rounded-full flex items-center justify-center text-orange-600 font-bold">&times;</button>
+            </div>
+            
+            <form id="rsvpForm" class="p-6">
+                <div id="guestContainer" class="max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="guest-row bg-orange-50 p-4 rounded-2xl mb-4 relative">
+                        <label class="block text-xs font-bold text-orange-400 uppercase mb-1">Tamu 1</label>
+                        <input type="text" name="guest_name[]" required placeholder="Nama Lengkap" class="w-full border-2 border-transparent focus:border-orange-400 rounded-xl p-3 outline-none mb-3">
+                        <select name="guest_menu[]" class="w-full border-2 border-transparent focus:border-orange-400 rounded-xl p-3 bg-white outline-none">
+                            <option value="Bak Mie Spesial">Bak Mie Spesial</option>
+                            <option value="Mie Ayam Jamur">Mie Ayam Jamur</option>
+                            <option value="Pangsit Goreng">Pangsit Goreng</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" onclick="addGuestRow()" class="w-full mb-6 text-orange-500 font-bold flex items-center justify-center gap-2 bg-orange-50 py-3 rounded-2xl border-2 border-dashed border-orange-200 hover:bg-orange-100 transition">
+                    <span>➕</span> Tambah Teman / Keluarga
+                </button>
+
+                <button type="submit" id="submitBtn" class="w-full bg-orange-500 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-orange-600 active:scale-95 transition-all">
+                    Kirim Konfirmasi 🌻
+                </button>
+            </form>
+
+            <div id="successMessage" class="hidden p-10 text-center">
+                <div class="text-7xl mb-4 floating">🌻</div>
+                <h4 class="font-header text-2xl text-orange-600 mb-2">Hore! Berhasil</h4>
+                <p class="text-gray-500">Konfirmasi kehadiran kamu sudah tercatat di meja Renjana. Sampai jumpa!</p>
+                <button onclick="closeRSVP()" class="mt-8 bg-yellow-100 text-orange-600 px-8 py-2 rounded-full font-bold">Oke!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKXobDoeLDzEeHftDtypRA4SjPz6onYui5Sl9rUmiYC20hKCxeVRMy0SIMqMRO9cKs/exec';
+
+        const state = {
+            name: "Renjana Naladiptha Sarci Tamonob",
+            date: "25 Februari 2026",
+            time: "17.00 Wita",
+            location: "Bak Mie Akiu Mahendradata",
+            map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3944.33123456!2d115.1789!3d-8.6789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwNDAnNDQuMCJTIDExNcKwMTAnNDQuMCJF!5e0!3m2!1sen!2sid!4v1620000000000",
+            isAdmin: false
+        };
+
+        function loadPersistedData() {
+            const saved = localStorage.getItem('invitation_settings');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.name = parsed.name || state.name;
+                state.date = parsed.date || state.date;
+                state.time = parsed.time || state.time;
+                state.location = parsed.location || state.location;
+                state.map = parsed.map || state.map;
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('display-name').innerText = state.name;
+            document.getElementById('display-date').innerText = state.date;
+            document.getElementById('display-time').innerText = state.time;
+            document.getElementById('display-location').innerText = state.location;
+            
+            let mapUrl = state.map;
+            if(mapUrl.includes('<iframe')) {
+                const match = mapUrl.match(/src="([^"]+)"/);
+                mapUrl = match ? match[1] : "";
+            }
+            document.getElementById('display-map').src = mapUrl;
+        }
+
+        function handleConfirmAttendance() {
+            const section = document.getElementById('menu-section');
+            section.classList.add('visible');
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openRSVP(menu) {
+            document.getElementById('rsvpModal').classList.add('active');
+            document.getElementById('selectedMenuDisplay').innerText = menu;
+            document.getElementsByName('guest_menu[]')[0].value = menu;
+            document.body.style.overflow = 'hidden';
+            document.getElementById('rsvpForm').classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+
+        function closeRSVP() {
+            document.getElementById('rsvpModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function addGuestRow() {
+            const count = document.querySelectorAll('.guest-row').length + 1;
+            const currentMenu = document.getElementById('selectedMenuDisplay').innerText;
+            const div = document.createElement('div');
+            div.className = 'guest-row bg-orange-50 p-4 rounded-2xl mb-4 relative animate-in slide-in-from-top duration-300';
+            div.innerHTML = `
+                <button type="button" onclick="this.parentElement.remove()" class="absolute right-3 top-3 text-red-300 text-xs font-bold uppercase">Hapus</button>
+                <label class="block text-xs font-bold text-orange-400 uppercase mb-1">Tamu ${count}</label>
+                <input type="text" name="guest_name[]" required placeholder="Nama Lengkap" class="w-full border-2 border-transparent focus:border-orange-400 rounded-xl p-3 outline-none mb-3">
+                <select name="guest_menu[]" class="w-full border-2 border-transparent focus:border-orange-400 rounded-xl p-3 bg-white outline-none">
+                    <option value="Bak Mie Spesial" ${currentMenu === 'Bak Mie Spesial' ? 'selected' : ''}>Bak Mie Spesial</option>
+                    <option value="Mie Ayam Jamur" ${currentMenu === 'Mie Ayam Jamur' ? 'selected' : ''}>Mie Ayam Jamur</option>
+                    <option value="Pangsit Goreng" ${currentMenu === 'Pangsit Goreng' ? 'selected' : ''}>Pangsit Goreng</option>
+                </select>
+            `;
+            document.getElementById('guestContainer').appendChild(div);
+            document.getElementById('guestContainer').scrollTop = document.getElementById('guestContainer').scrollHeight;
+        }
+
+        function toggleLogin() {
+            if (state.isAdmin) {
+                openSettings();
+            } else {
+                document.getElementById('loginModal').classList.toggle('active');
+            }
+        }
+
+        function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            if (u === 'renjana' && p === '25022025') {
+                state.isAdmin = true;
+                document.getElementById('loginModal').classList.remove('active');
+                openSettings();
+            } else {
+                alert('Username atau Password salah!');
+            }
+        }
+
+        function openSettings() {
+            document.getElementById('set-name').value = state.name;
+            document.getElementById('set-date').value = state.date;
+            document.getElementById('set-time').value = state.time;
+            document.getElementById('set-location').value = state.location;
+            document.getElementById('set-map').value = state.map;
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        async function saveSettings() {
+            const btn = document.getElementById('save-settings-btn');
+            btn.disabled = true;
+            btn.innerText = 'Menyimpan...';
+
+            state.name = document.getElementById('set-name').value;
+            state.date = document.getElementById('set-date').value;
+            state.time = document.getElementById('set-time').value;
+            state.location = document.getElementById('set-location').value;
+            state.map = document.getElementById('set-map').value;
+            
+            localStorage.setItem('invitation_settings', JSON.stringify(state));
+            updateUI();
+
+            if (SCRIPT_URL && SCRIPT_URL.includes('macros')) {
+                try {
+                    const payload = {
+                        type: 'settings',
+                        name: state.name,
+                        date: state.date,
+                        time: state.time,
+                        location: state.location,
+                        map: state.map,
+                        timestamp: new Date().toLocaleString()
+                    };
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                } catch (err) {
+                    console.error("Gagal simpan ke spreadsheet:", err);
+                }
+            }
+
+            btn.disabled = false;
+            btn.innerText = 'Simpan';
+            closeSettings();
+        }
+
+        function logoutAdmin() {
+            state.isAdmin = false;
+            closeSettings();
+        }
+
+        document.getElementById('rsvpForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Mengirim...';
+
+            const names = Array.from(document.getElementsByName('guest_name[]')).map(i => i.value);
+            const menus = Array.from(document.getElementsByName('guest_menu[]')).map(i => i.value);
+            const data = {
+                type: 'rsvp',
+                guests: names.map((n, i) => ({ nama: n, menu: menus[i], timestamp: new Date().toLocaleString() }))
+            };
+
+            try {
+                if (SCRIPT_URL && SCRIPT_URL.includes('macros')) {
+                    await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+                }
+                document.getElementById('rsvpForm').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('rsvpForm').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+            }
+            btn.disabled = false;
+            btn.innerText = 'Kirim Konfirmasi 🌻';
+        };
+
+        window.onload = loadPersistedData;
+    </script>
+</body>
+</html>
